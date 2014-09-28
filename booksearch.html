@@ -65,8 +65,6 @@
 				var name = clicked.find('.name').html();
 				console.log(name);	
 				var decoded = $("<div/>").html(name).text();
-				//var id = clicked.find('.id').html();
-				//var decodedid = $("<div/>").html(id).text();
 				$('#searchid').val(decoded);
 			});
 			$(document).live("click", function(e) { 
