@@ -1,95 +1,75 @@
+<!DOCTYPE HTML>
 <html>
 <head>
-	<script type="text/javascript" src="jquery-1.11.0.min.js"></script>
-	<link href="bootstrap.min.css" rel="stylesheet">
-	<!-- css for search box -->
-	<style type="text/css">
-		.content{
-			width:900px;
-			margin:0 auto;
-		}
-		#searchid
-		{
-			width:500px;
-			border:solid 1px #000;			
-			padding:10px;
-			font-size:14px;
-		}
-		#result
-		{
-			position:absolute;
-			margin-top:3px;
-			width:500px;
-			display:none;
-			margin-top:-1px;
-			border-top:0px;
-			overflow:hidden;
-			border:1px #CCC solid;
-			background-color: white;
-		}
-		.show
-		{
-			font-size:15px; 
-			height:40px;
-		}
-		.show:hover
-		{
-			background:#330033 ;
-			color:#FFF;
-			cursor:pointer;
-		}
-	</style>
+  <meta charset="utf-8">
+  <title>Create an autocomplete input box with typeahead.js</title>
+  
+  <!-- Bootstrap CSS Toolkit styles 
+  <link rel="stylesheet" href="bootstrap.min.css">
+  <link rel="stylesheet" href="styles.css">
+
+	<script src="typehead.bundle.js"></script>
+<script type="text/javascript" src="http://twitter.github.io/typeahead.js/releases/latest/bloodhound.js"></script>	
+<script type="text/javascript" src="http://twitter.github.io/typeahead.js/releases/latest/typeahead.bundle.js"></script>	
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>  
+
+  <script src="jquery-1.10.2.min.js"></script>
+  -->
+<link rel="stylesheet" href="bootstrap.min.css">
+<link rel="stylesheet" href="typehead.css">
+
+<script src="bootstrap.min.js"></script>
+  <script src="handlebars-v2.0.0.js"></script>
+
+<script src="http://code.jquery.com/jquery-1.11.1.js" type="text/javascript"></script>
+<script type="text/javascript" src="http://twitter.github.io/typeahead.js/releases/latest/typeahead.bundle.js"></script>
+<script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js" type="text/javascript"></script>
+	
+<style>
+	#custom-templates .empty-message {
+  padding: 5px 10px;
+ text-align: center;
+}
+</style>
 
 	
+  <script type="text/javascript">
+	$( document ).ready(function() {
 
-	<script>
-	$(document).ready(function(){
-
-		$(function(){
-			// search box on key press
-			$(".search").keyup(function() { 
-				var searchid = $(this).val();
-				if(searchid != ""){
-					$.get( "https://www.googleapis.com/books/v1/volumes?q="+searchid + "&maxResults=5", function(data) {
-						$("#result").html("");			
-						for (i = 0; i < 5; i++) { 
-							$("#result").append("<div class=\"show container\" align=\"left\"><img src="+data.items[i].volumeInfo.imageLinks.smallThumbnail+" height = \"30\" width=\"30\"><span class=\"name\"> "+ data.items[i].volumeInfo.title + "<span></div>");
-						}					
-						
-					});
-				}	
-			});
-			$("#result").live("click",function(e){ 
-				var clicked = $(e.target);
-				console.log(clicked);
-				var name = clicked.find('.name').html();
-				console.log(name);	
-				var decoded = $("<div/>").html(name).text();
-				$('#searchid').val(decoded);
-			});
-			$(document).live("click", function(e) { 
-				var $clicked = $(e.target);
-				if (! $clicked.hasClass("search")){
-					$("#result").fadeOut(); 
-				}
-			});
-			$('#searchid').click(function(){
-				jQuery("#result").fadeIn();
-			});
+		var bestPictures = new Bloodhound({
+		  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+		  queryTokenizer: Bloodhound.tokenizers.whitespace,
+		  //prefetch: '../data/films/post_1960.json',
+		  remote: 'data.php?q=%QUERY'
+		});
+		 
+		bestPictures.initialize();
+		 
+		$('.typeahead').typeahead(null, {
+		  name: 'best-pictures',
+		  displayKey: 'title',
+		  source: bestPictures.ttAdapter(),
+		  templates: {
+		    empty: [
+		      '<div class="empty-message">',
+		      'unable to find any Book matching the current query',
+		      '</div>'
+		    ].join('\n'),
+		    suggestion: Handlebars.compile('<div class=\"bs-example\"><div class=\"media\"><img src=\"{{smallThumbnail}}\" width=\"40\" height=\"40\" class=\"media-object pull-left\" alt=\"Sample Image\"><div class=\"media-body\"><h4 class=\"media-heading\">{{title}} <small><i>{{subtitle}}</i></small></h4><p>-{{author}}</p></div></div></div>')
+		  }
 		});
 	});
-	</script>
+  </script>
+
 </head>
 
 <body>
-
-<input type="text" class="search form-control" id="searchid" placeholder="Search for book" />
-<div id="result">
+	
+<div id="custom-templates">
+  <input class="typeahead"  type="text" placeholder="Search Books..by author name">
 </div>
 
 
 
-</body>
-
-
+</body> 
 </html>
